@@ -1,5 +1,4 @@
 const db = require("./connect");
-
 const retrive = (token) => {
     return db.collection("user").where("id","==",token).get()
         .then((querySnapshot) => {
