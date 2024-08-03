@@ -12,23 +12,16 @@ app.use(express.json());
 app.listen(3001, () => {
     console.log("listening on 3001");
 });
-let token = "xyz"
 app.post("/storetoken", async (req, res) => {
     const token = req.body.token;
+    console.log(token)
+        const data = {
+            profile:"https://example2.com",
+            name:"Ash",
+            token:token
+        }
+        setdata(data);
+        retrive(token).then(res=>console.log(res));
     res.sendStatus(200);
 });
 
-retrive(token)
-    .then(data => {
-        console.log(data);
-    })
-    .catch(err => {
-        console.error("Error retrieving data:", err);
-    });
-
-const data = {
-    profile:"https://example2.com",
-    name:"Ash",
-    id:token
-}
-// setdata(data)
