@@ -6,8 +6,6 @@ export default function App(){
   const url = "http://localhost:3001"
   const [signup,setSignup] = useState(false)
   const autHandler = async(token)=>{
-    // const form = new FormData();
-    // form.append("token",token);
     const res = await fetch(`${url}/storetoken`,{
       method:"post",
       headers: {
@@ -15,7 +13,8 @@ export default function App(){
     },
       body: JSON.stringify({ token: token.access_token })
     })
-    // console.log(res);
+    const data = await res.json();
+    console.log(data);
   }
   const login = useGoogleLogin({
     onSuccess: tokenResponse => autHandler(tokenResponse),

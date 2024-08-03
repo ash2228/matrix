@@ -1,9 +1,6 @@
 const db = require("./connect")
 const setData = (data)=>{
-    db.collection("user").add(data)
-    .then(res=>{
-        console.log(res);
-    })
+    return db.collection("user").add(data)
     .catch(err=>{
         console.log(err)
     })
