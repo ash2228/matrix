@@ -38,8 +38,9 @@ app.post("/storetoken", async (req, res) => {
         }
 });
 app.post("/update",(req,res)=>{
-    let products = ["prod1","prod2"];
-    update("117315074430459986118",products);
+    let products = req.body.products;
+    let id = req.body.id
+    update(id,products);
 })
 const otpStore = {}
 app.post("/verifymail",async(req,res)=>{
