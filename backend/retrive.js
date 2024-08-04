@@ -5,6 +5,7 @@ const retrive = (id) => {
             if (!querySnapshot.empty) {
                 const doc = querySnapshot.docs[0];
                 return doc.data();
+
             } else {
                 return undefined;
             }

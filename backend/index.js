@@ -3,7 +3,8 @@ const app = express();
 const cors = require("cors");
 const retrive = require("./retrive");
 const setdata = require("./setdata");
-
+const update = require("./update");
+const sendmail = require("./mailverification")
 
 app.use(cors());
 app.use(express.json());
@@ -19,7 +20,8 @@ app.post("/storetoken", async (req, res) => {
             profile:parseddata.picture,
             name:parseddata.name,
             token:token,
-            id:parseddata.id
+            id:parseddata.id,
+            products:[]
         }
         let result = await retrive(parseddata.id);
         if(result){
@@ -35,4 +37,33 @@ app.post("/storetoken", async (req, res) => {
             }
         }
 });
-
+app.post("/update",(req,res)=>{
+    let products = ["prod1","prod2"];
+    update("117315074430459986118",products);
+})
+const otpStore = {}
+app.post("/verifymail",async(req,res)=>{
+    const otp = Math.floor(1000 + Math.random() * 9000);
+    mail = req.body.mail
+    console.log(`otp generated:${otp}`)
+    try {
+        await sendmail(mail, otp);
+        otpStore[mail] = otp;
+    
+        res.status(200).json({ message: 'OTP sent to your email' });
+      } catch (error) {
+        console.error('Error sending email:', error);
+        res.status(500).json({ message: 'Error sending OTP' });
+      }
+})
+app.post("/verifyotp",(req,res)=>{
+    const { mail, otp } = req.body;
+    console.log(`otp got:${otp}`)
+    console.log(`otp from data:${otpStore[mail]}`)
+    if (otpStore[mail] == otp) {
+        delete otpStore[mail];
+        res.status(200).json({ message: 'OTP verified successfully' });
+      } else {
+        res.status(400).json({ message: 'Invalid OTP' });
+      }
+})
