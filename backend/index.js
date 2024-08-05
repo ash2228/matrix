@@ -4,7 +4,8 @@ const cors = require("cors");
 const retrive = require("./retrive");
 const setdata = require("./setdata");
 const update = require("./update");
-const sendmail = require("./mailverification")
+const sendmail = require("./mailverification");
+const uuid = require("uuid4");
 
 app.use(cors());
 app.use(express.json());
@@ -16,55 +17,78 @@ app.post("/storetoken", async (req, res) => {
     const token = req.body.token;
     const googledata = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`);
     const parseddata = await googledata.json();
-        const data = {
-            profile:parseddata.picture,
-            name:parseddata.name,
-            token:token,
-            id:parseddata.id,
-            products:[]
+    const data = {
+        profile:parseddata.picture,
+        name:parseddata.name,
+        token:token,
+        id:parseddata.id,
+        products:[],
+        cart:[],
+        mail:parseddata.email,
+        method:"Google"
+    }
+    let result = await retrive(parseddata.email);
+    if(result){
+        res.json({error:"user already exists"});
+    }
+    else{
+        try{
+            await setdata(data);
+            res.json({success:"User successfully created"})
         }
-        let result = await retrive(parseddata.id);
-        if(result){
-            res.json({error:"user already exists"});
+        catch(err){
+            res.send(404).json({error:"user cannot be created"})
         }
-        else{
-            try{
-                await setdata(data);
-                res.json({success:"User successfully created"})
-            }
-            catch(err){
-                res.send(404).json({error:"user cannot be created"})
-            }
-        }
+    }
 });
 app.post("/update",(req,res)=>{
     let products = req.body.products;
     let id = req.body.id
     update(id,products);
 })
-const otpStore = {}
-app.post("/verifymail",async(req,res)=>{
-    const otp = Math.floor(1000 + Math.random() * 9000);
-    mail = req.body.mail
-    console.log(`otp generated:${otp}`)
-    try {
-        await sendmail(mail, otp);
-        otpStore[mail] = otp;
-    
-        res.status(200).json({ message: 'OTP sent to your email' });
-      } catch (error) {
-        console.error('Error sending email:', error);
-        res.status(500).json({ message: 'Error sending OTP' });
-      }
+app.post("/register",async(req,res)=>{
+    mail = req.body.mail;
+    const first_name = req.body.first_name;
+    const last_name = req.body.last_name;
+    const password = req.body.password;
+    const college = req.body.college;
+    const id = uuid();
+    const data = {
+            first_name:first_name,
+            last_name:last_name,
+            password:password,
+            college:college,
+            mail:mail,
+            products:[],
+            cart:[],
+            id:id,
+            method:"Form"
+    }
+    let result = await retrive(mail);
+    console.log(result);
+    if(result){
+        res.json({error:"user already exists"});
+    }
+    else{
+        try{
+            await setdata(data);
+            res.json({success:"User successfully created"})
+        }
+        catch(err){
+            res.send(404).json({error:"user cannot be created"})
+        }
+    }
 })
-app.post("/verifyotp",(req,res)=>{
-    const { mail, otp } = req.body;
-    console.log(`otp got:${otp}`)
-    console.log(`otp from data:${otpStore[mail]}`)
-    if (otpStore[mail] == otp) {
-        delete otpStore[mail];
-        res.status(200).json({ message: 'OTP verified successfully' });
-      } else {
-        res.status(400).json({ message: 'Invalid OTP' });
-      }
+app.post("/loginwithgoogle",async(req,res)=>{
+    const token = req.body.token;
+    const googledata = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`);
+    const data = await googledata.json();
+    const mail = data.email;
+    const result = await retrive(mail);
+    if(!result){
+        res.status(404).json({error:"Email not found in the db"})
+    }
+    else{
+        res.status(200).json({mail:mail});
+    }
 })

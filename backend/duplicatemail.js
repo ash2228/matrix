@@ -1,6 +1,6 @@
 const db = require("./connect");
-const retrive = (mail) => {
-    return db.collection("user").where("mail","==",mail).get()
+const duplicatemail = (mail) => {
+    return db.collection("user").where("mail","==",id).get()
         .then((querySnapshot) => {
             if (!querySnapshot.empty) {
                 const doc = querySnapshot.docs[0];
@@ -16,4 +16,4 @@ const retrive = (mail) => {
         });
 };
 
-module.exports = retrive;
+module.exports = duplicatemail;
