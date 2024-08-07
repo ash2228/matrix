@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useGoogleLogin } from '@react-oauth/google';
-import { ToastContainer, toast } from 'react-toastify';
+import { Toastify } from "toastify";
 import "./App.css"
 export default function Auth(){
     const url = "http://localhost:3001"
@@ -54,8 +54,8 @@ export default function Auth(){
       })
       const data = await res.json();
       console.log(data)
-    }   
-    
+    }
+    console.log(Toastify)
     return !signup?(<div className="h-[100vh] w-[100vw] flex items-center justify-center">
       <div className="border-[0.5px] border-gray-500 rounded-lg gap-5 flex flex-col px-5 py-5 text-white">
       <h1 className="text-center font-bold text-3xl">Login</h1>
